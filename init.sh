@@ -1,7 +1,26 @@
 #!/bin/bash
 
-if [[ ! $EUID -ne 0 ]]; then
-   echo "This script should not be run as root. Please run without sudo." 
+if [ "$#" -ne 1 ]; then
+  echo "Need to pass in $USER as argument"
+  exit 1
+fi
+
+USR=$1
+echo Hi $USR
+sleep 1
+echo About to start installing scripts
+sleep 1
+
+while [ $count -lt $total ]; do
+  sleep 0.5 # this is work
+  count=$(( $count + 1 ))
+  pd=$(( $count * 73 / $total ))
+  printf "\r%3d.%1d%% %.${pd}s" $(( $count * 100 / $total )) $(( ($count * 1000 / $total) % 10 )) $pstr
+done
+
+
+if [[ $EUID -ne 0 ]]; then
+   echo "This script should be run as root. Please run with sudo." 
    exit 1
 fi
 
@@ -18,12 +37,12 @@ fi
 
 sudoers="/etc/sudoers"
 
-if grep -q "$USER ALL=(ALL) NOPASSWD: ALL" "$sudoers"
+if grep -q "$USR ALL=(ALL) NOPASSWD: ALL" "$sudoers"
    then
-      echo Sudoers file already contains $USER
+      echo Sudoers file already contains $USR
    else
-      echo export "$USER ALL=(ALL) NOPASSWD: ALL" >> $sudoers
-      echo Added $USER to sudoers file
+      echo "$USR ALL=(ALL) NOPASSWD: ALL" >> $sudoers
+      echo Added $USR to sudoers file
       . ~/.bashrc
 fi
 
@@ -40,32 +59,36 @@ else
    touch "$file"
 fi
 
-sudo chmod 400 ~/.ssh/authorized_keys
+chmod 400 ~/.ssh/authorized_keys
 
-sudo apt-get update 
+apt-get update 
 
-sudo apt-get upgrade
+apt-get upgrade
 
 apt-get install vim -y
 
 apt-get install zsh -y
 
-curl -o .z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
+sudo -H -u $USR curl -silent  -o .z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
 
 timedatectl set-timezone America/Chicago
 
-curl -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.zshrc
+sudo -H -u $USR curl -silent -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.zshrc
 
-curl -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.vimrc
+sudo -H -u $USR curl -silent  -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.vimrc
 
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | bash
+sudo -H -u $USR curl -silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | bash
 
 . ~/.bashrc
 
-nvm install --lts
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+sudo -H -u $USR nvm install --lts
 
 chsh -s $(which zsh)
 
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+sudo -H -u $USR sh -silent -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
-npm install pm2@latest -g
+sudo -H -u $USR npm install pm2@latest -g
