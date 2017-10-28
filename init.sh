@@ -15,6 +15,16 @@ if grep -q "export LC_ALL" "$bashrc"
       . ~/.bashrc
 fi
 
+sudoers="/etc/sudoers"
+
+if grep -q "$USER ALL=(ALL) NOPASSWD: ALL" "$sudoers"
+   then
+      echo Sudoers file already contains $USER
+   else
+      echo export $USER ALL=(ALL) NOPASSWD: ALL >> $sudoers
+      echo Added $USER to sudoers file
+      . ~/.bashrc
+fi
 
 
 mkdir Dev 
