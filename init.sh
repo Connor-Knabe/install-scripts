@@ -1,6 +1,6 @@
 #!/bin/bash
-if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root. Please run with sudo." 
+if [[ ! $EUID -ne 0 ]]; then
+   echo "This script should not be run as root. Please run without sudo." 
    exit 1
 fi
 
@@ -21,7 +21,7 @@ if grep -q "$USER ALL=(ALL) NOPASSWD: ALL" "$sudoers"
    then
       echo Sudoers file already contains $USER
    else
-      echo export $USER ALL=(ALL) NOPASSWD: ALL >> $sudoers
+      echo export "$USER ALL=(ALL) NOPASSWD: ALL" >> $sudoers
       echo Added $USER to sudoers file
       . ~/.bashrc
 fi
@@ -39,11 +39,11 @@ else
    touch "$file"
 fi
 
-chmod 400 ~/.ssh/authorized_keys
+sudo chmod 400 ~/.ssh/authorized_keys
 
-apt-get update 
+sudo apt-get update 
 
-apt-get upgrade
+sudo apt-get upgrade
 
 apt-get install vim -y
 
