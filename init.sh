@@ -1,20 +1,19 @@
 #!/bin/bash
 
-if [[ $EUID -ne 0 ]]; then
-   echo "This script should be run as root. Please run with sudo." 
+
+
+if [[ ! $EUID -ne 0 ]]; then
+   echo "This script should not be run as root. Please run without sudo." 
    exit 1
 fi
 
-if [ "$#" -ne 1 ]; then
-  echo "Need to pass in \$USER as argument!"
-  exit 1
-fi
 
-USR=$1
-echo Hi $USR
+
+echo Hi $USER
 sleep 1
 echo About to start installing scripts
 sleep 1
+
 
 bashrc="$HOME/.bashrc"
 
@@ -29,12 +28,12 @@ fi
 
 sudoers="/etc/sudoers"
 
-if grep -q "$USR ALL=(ALL) NOPASSWD: ALL" "$sudoers"
+if sudo grep -q "$USER ALL=(ALL) NOPASSWD: ALL" "$sudoers"
    then
-      echo Sudoers file already contains $USR
+      echo Sudoers file already contains $USER
    else
-      echo "$USR ALL=(ALL) NOPASSWD: ALL" >> $sudoers
-      echo Added $USR to sudoers file
+      echo "$USER ALL=(ALL) NOPASSWD: ALL" >> $sudoers
+      echo Added $USER to sudoers file
       . ~/.bashrc
 fi
 
@@ -51,36 +50,33 @@ else
    touch "$file"
 fi
 
-chmod 400 ~/.ssh/authorized_keys
+sudo chmod 400 ~/.ssh/authorized_keys
 
-apt-get update 
+sudo apt-get update 
 
-apt-get upgrade
+sudo apt-get upgrade
 
-apt-get install vim -y
+sudo apt-get install vim -y
 
-apt-get install zsh -y
+sudo apt-get install zsh -y
 
-sudo -H -u $USR curl -s  -o .z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
+curl -s  -o z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
 
 timedatectl set-timezone America/Chicago
 
-sudo -H -u $USR curl -s -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.zshrc
+curl -s  -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.vimrc
 
-sudo -H -u $USR curl -s  -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.vimrc
-
-sudo -H -u $USR curl -s -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | bash
+curl -s -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | bash
 
 . ~/.bashrc
+. ~/.zshrc
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+nvm install --lts
 
-sudo -H -u $USR nvm install --lts
+sudo chsh -s $(which zsh)
 
-chsh -s $(which zsh)
+sh -s -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
-sudo -H -u $USR sh -s -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+curl -s -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.zshrc
 
-sudo -H -u $USR npm install pm2@latest -g
+npm install pm2@latest -g
