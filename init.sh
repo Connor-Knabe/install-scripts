@@ -4,11 +4,30 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+bashrc="$HOME/.bashrc"
+
+if grep -q "export LC_ALL" "$bashrc"
+   then
+      echo Bashrc already has locale settings
+   else
+      echo export LC_ALL=C >> $bashrc
+      echo Added locale to bashrc
+      . ~/.bashrc
+fi
+
+
+
 mkdir Dev 
 
 mkdir ~/.ssh
 
-touch ~/.ssh/authorized_keys
+authkeys="$HOME/.ssh/authorized_keys"
+if [ -f "$authkeys" ]
+then
+   echo "$file already exists."
+else
+   touch "$file"
+fi
 
 chmod 400 ~/.ssh/authorized_keys
 
@@ -16,7 +35,7 @@ apt-get update
 
 apt-get upgrade
 
-apt-get install vim
+apt-get install vim -y
 
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
