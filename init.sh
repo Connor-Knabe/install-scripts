@@ -6,6 +6,12 @@ fi
 
 mkdir Dev 
 
+mkdir ~/.ssh
+
+touch ~/.ssh/authorized_keys
+
+chmod 400 ~/.ssh/authorized_keys
+
 apt-get update 
 
 apt-get upgrade
