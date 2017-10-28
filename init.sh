@@ -1,7 +1,12 @@
 #!/bin/bash
 
+if [[ $EUID -ne 0 ]]; then
+   echo "This script should be run as root. Please run with sudo." 
+   exit 1
+fi
+
 if [ "$#" -ne 1 ]; then
-  echo "Need to pass in $USER as argument"
+  echo "Need to pass in \$USER as argument!"
   exit 1
 fi
 
@@ -10,19 +15,6 @@ echo Hi $USR
 sleep 1
 echo About to start installing scripts
 sleep 1
-
-while [ $count -lt $total ]; do
-  sleep 0.5 # this is work
-  count=$(( $count + 1 ))
-  pd=$(( $count * 73 / $total ))
-  printf "\r%3d.%1d%% %.${pd}s" $(( $count * 100 / $total )) $(( ($count * 1000 / $total) % 10 )) $pstr
-done
-
-
-if [[ $EUID -ne 0 ]]; then
-   echo "This script should be run as root. Please run with sudo." 
-   exit 1
-fi
 
 bashrc="$HOME/.bashrc"
 
@@ -69,15 +61,15 @@ apt-get install vim -y
 
 apt-get install zsh -y
 
-sudo -H -u $USR curl -silent  -o .z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
+sudo -H -u $USR curl -s  -o .z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
 
 timedatectl set-timezone America/Chicago
 
-sudo -H -u $USR curl -silent -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.zshrc
+sudo -H -u $USR curl -s -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.zshrc
 
-sudo -H -u $USR curl -silent  -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.vimrc
+sudo -H -u $USR curl -s  -O https://raw.githubusercontent.com/Connor-Knabe/install-scripts/master/.vimrc
 
-sudo -H -u $USR curl -silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | bash
+sudo -H -u $USR curl -s -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | bash
 
 . ~/.bashrc
 
@@ -89,6 +81,6 @@ sudo -H -u $USR nvm install --lts
 
 chsh -s $(which zsh)
 
-sudo -H -u $USR sh -silent -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+sudo -H -u $USR sh -s -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 sudo -H -u $USR npm install pm2@latest -g
