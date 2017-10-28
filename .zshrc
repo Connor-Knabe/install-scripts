@@ -84,6 +84,7 @@ alias gcma='git add -A :/ && git commit -m'
 alias gs='git status'
 alias rm='rm -i'
 . .z.sh
+export LC_ALL=C
 
 if [ ! -S ~/.ssh/ssh_auth_sock ]; then
   eval `ssh-agent`
