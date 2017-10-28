@@ -37,6 +37,8 @@ apt-get upgrade
 
 apt-get install vim -y
 
+apt-get install zsh -y
+
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 curl -o .z.sh https://raw.githubusercontent.com/rupa/z/master/z.sh
