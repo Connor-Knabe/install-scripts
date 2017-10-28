@@ -1,4 +1,5 @@
 #!/bin/bash
+
 if [[ ! $EUID -ne 0 ]]; then
    echo "This script should not be run as root. Please run without sudo." 
    exit 1
